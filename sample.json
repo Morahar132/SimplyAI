@@ -1,0 +1,23 @@
+{
+  "_id": {
+    "$oid": "688b82d6d32dee8331cee1c9"
+  },
+  "c": 1753973462.733024,
+  "card_type": "FILL_BLANKS",
+  "contents": {
+    "topic": "Astronomy",
+    "question": "It takes about {{BLANK}} minutes for sunlight to travel from the Sun to Earth.",
+    "options": [
+      "8",
+      "1",
+      "20",
+      "60"
+    ],
+    "correct_answers": [
+      "8"
+    ]
+  },
+  "deleted": false,
+  "u": 1753973462.7330072,
+  "version": 1
+}
