@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#667eea">
+    <meta name="description" content="AI-Powered JEE Practice Exam Platform - Generate custom JEE-level questions">
+    <title>JEE Exam Platform - Standalone Demo</title>
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+    <!-- Setup Screen -->
+    <div class="setup-screen" id="setupScreen">
+        <div class="setup-container">
+            <div class="setup-header">
+                <div class="setup-logo">JEE</div>
+                <div class="setup-title">JEE Practice Platform</div>
+                <div class="setup-subtitle">Standalone Demo with Sample Questions</div>
+            </div>
+
+            <div class="demo-note">
+                📌 <strong>Demo Mode:</strong> This version uses pre-loaded sample questions. For AI-generated questions, deploy with backend server.
+            </div>
+
+            <div class="setup-form">
+                <div class="form-group">
+                    <label class="form-label">Number of Questions per Subject</label>
+                    <select class="form-select" id="questionsPerSubject">
+                        <option value="5">5 Questions</option>
+                        <option value="10" selected>10 Questions</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Difficulty Level</label>
+                    <div class="difficulty-options">
+                        <button class="difficulty-btn" data-difficulty="easy">Easy</button>
+                        <button class="difficulty-btn selected" data-difficulty="medium">Medium</button>
+                        <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Select Subjects</label>
+                    <div class="subject-checkboxes">
+                        <label class="checkbox-item checked">
+                            <input type="checkbox" checked data-subject="physics">
+                            <span>Physics</span>
+                        </label>
+                        <label class="checkbox-item checked">
+                            <input type="checkbox" checked data-subject="chemistry">
+                            <span>Chemistry</span>
+                        </label>
+                        <label class="checkbox-item checked">
+                            <input type="checkbox" checked data-subject="mathematics">
+                            <span>Mathematics</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Exam Duration (minutes)</label>
+                    <select class="form-select" id="examDuration">
+                        <option value="30">30 Minutes</option>
+                        <option value="60">60 Minutes</option>
+                        <option value="90">90 Minutes</option>
+                        <option value="120">120 Minutes</option>
+                        <option value="180" selected>180 Minutes (3 Hours)</option>
+                    </select>
+                </div>
+
+                <button class="generate-btn" id="generateBtn" onclick="generateExam()">
+                    Start Practice Test
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div class="loading-text">Generating Your Practice Test...</div>
+            <div class="loading-subtext">Loading questions...</div>
+        </div>
+    </div>
+
+    <!-- Exam Header -->
+    <div class="exam-header hidden" id="examHeader">
+        <div class="exam-title">JEE Practice Test - Demo</div>
+        <div class="exam-info">
+            <div class="student-info">
+                <div>Practice Mode</div>
+            </div>
+            <div class="timer" id="timer">
+                <span>⏱</span>
+                <span id="timerDisplay">03:00:00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exam Container -->
+    <div class="exam-container" id="examContainer">
+        <div class="question-panel">
+            <div class="section-tabs" id="sectionTabs"></div>
+
+            <div class="question-content">
+                <div class="question-header">
+                    <div class="question-number" id="questionNumber">Question 1</div>
+                    <div class="question-marks">+4 Marks</div>
+                </div>
+
+                <div class="question-text" id="questionText"></div>
+                <div class="options" id="optionsContainer"></div>
+            </div>
+
+            <div class="question-navigation">
+                <button class="nav-button mark-review" onclick="markForReview()">Mark for Review & Next</button>
+                <button class="nav-button clear" onclick="clearResponse()">Clear Response</button>
+                <button class="nav-button save-next" onclick="saveAndNext()">Save & Next</button>
+            </div>
+        </div>
+
+        <div class="palette-panel">
+            <div class="palette-header">
+                <div class="palette-legend">
+                    <div class="legend-item">
+                        <div class="legend-box answered"></div>
+                        <span>Answered</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box not-answered"></div>
+                        <span>Not Answered</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box marked"></div>
+                        <span>Marked</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box not-visited"></div>
+                        <span>Not Visited</span>
+                    </div>
+                </div>
+
+                <div class="palette-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="answeredCount">0</div>
+                        <div>Answered</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="notAnsweredCount">0</div>
+                        <div>Not Answered</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="markedCount">0</div>
+                        <div>Marked</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="notVisitedCount">30</div>
+                        <div>Not Visited</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="palette-questions" id="paletteQuestions"></div>
+
+            <div class="palette-footer">
+                <button class="submit-button" onclick="showSubmitModal()">Submit Exam</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Modal -->
+    <div class="modal" id="submitModal">
+        <div class="modal-content">
+            <div class="modal-title">Confirm Submission</div>
+            <div class="modal-body">
+                <p>Are you sure you want to submit your exam? Once submitted, you cannot make any changes.</p>
+                
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">Answered</div>
+                        <div class="summary-value" style="color: #4caf50;" id="modalAnswered">0</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Not Answered</div>
+                        <div class="summary-value" style="color: #f44336;" id="modalNotAnswered">0</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Marked</div>
+                        <div class="summary-value" style="color: #9c27b0;" id="modalMarked">0</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Not Visited</div>
+                        <div class="summary-value" style="color: #9e9e9e;" id="modalNotVisited">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-button cancel" onclick="closeSubmitModal()">Go Back</button>
+                <button class="modal-button confirm" onclick="submitExam()">Submit Exam</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="question-bank.js"></script>
+    <script>
+        // Global variables
+        let examData = {};
+        let currentSection = null;
+        let currentQuestionIndex = 0;
+        let questionStates = {};
+        let timeRemaining = 180 * 60;
+        let timerInterval;
+        let selectedSubjects = ['physics', 'chemistry', 'mathematics'];
+        let selectedDifficulty = 'medium';
+
+        // Setup screen interactions
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedDifficulty = this.dataset.difficulty;
+            });
+        });
+
+        document.querySelectorAll('.checkbox-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+                this.classList.toggle('checked', checkbox.checked);
+                updateSelectedSubjects();
+            });
+        });
+
+        function updateSelectedSubjects() {
+            selectedSubjects = [];
+            document.querySelectorAll('.checkbox-item input:checked').forEach(cb => {
+                selectedSubjects.push(cb.dataset.subject);
+            });
+        }
+
+        // Generate exam using sample questions
+        function generateExam() {
+            if (selectedSubjects.length === 0) {
+                alert('Please select at least one subject!');
+                return;
+            }
+
+            const numQuestions = parseInt(document.getElementById('questionsPerSubject').value);
+            const duration = parseInt(document.getElementById('examDuration').value);
+            
+            timeRemaining = duration * 60;
+
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('loadingOverlay').classList.add('active');
+
+            setTimeout(() => {
+                examData = {};
+                
+                selectedSubjects.forEach(subject => {
+                    examData[subject] = QUESTION_BANK[subject].slice(0, numQuestions);
+                });
+
+                startExam();
+            }, 1500);
+        }
+
+        function startExam() {
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('loadingOverlay').classList.remove('active');
+            document.getElementById('examHeader').classList.remove('hidden');
+            document.getElementById('examContainer').classList.add('active');
+
+            currentSection = selectedSubjects[0];
+            currentQuestionIndex = 0;
+
+            initializeQuestionStates();
+            createSectionTabs();
+            loadQuestionPalette();
+            loadQuestion();
+            startTimer();
+        }
+
+        function createSectionTabs() {
+            const tabsContainer = document.getElementById('sectionTabs');
+            tabsContainer.innerHTML = '';
+
+            const subjectNames = {
+                physics: 'Physics',
+                chemistry: 'Chemistry',
+                mathematics: 'Mathematics'
+            };
+
+            selectedSubjects.forEach((subject, index) => {
+                const tab = document.createElement('button');
+                tab.className = `section-tab ${index === 0 ? 'active' : ''}`;
+                tab.textContent = subjectNames[subject];
+                tab.dataset.section = subject;
+                tab.onclick = () => changeSection(subject);
+                tabsContainer.appendChild(tab);
+            });
+        }
+
+        function changeSection(section) {
+            currentSection = section;
+            currentQuestionIndex = 0;
+
+            document.querySelectorAll('.section-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.section === section);
+            });
+
+            loadQuestionPalette();
+            loadQuestion();
+        }
+
+        function initializeQuestionStates() {
+            Object.keys(examData).forEach(section => {
+                examData[section].forEach((q, index) => {
+                    questionStates[q.id] = {
+                        status: 'not-visited',
+                        answer: null,
+                        section: section,
+                        index: index
+                    };
+                });
+            });
+
+            const totalQuestions = Object.values(examData).reduce((sum, questions) => sum + questions.length, 0);
+            document.getElementById('notVisitedCount').textContent = totalQuestions;
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                
+                if (timeRemaining <= 300) {
+                    document.getElementById('timer').classList.add('warning');
+                }
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    autoSubmitExam();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const hours = Math.floor(timeRemaining / 3600);
+            const minutes = Math.floor((timeRemaining % 3600) / 60);
+            const seconds = timeRemaining % 60;
+            
+            document.getElementById('timerDisplay').textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function loadQuestionPalette() {
+            const container = document.getElementById('paletteQuestions');
+            container.innerHTML = '';
+            
+            Object.keys(examData).forEach(section => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'palette-section';
+                
+                const subjectNames = {
+                    physics: 'Physics',
+                    chemistry: 'Chemistry',
+                    mathematics: 'Mathematics'
+                };
+                
+                const title = document.createElement('div');
+                title.className = 'palette-section-title';
+                title.textContent = subjectNames[section];
+                sectionDiv.appendChild(title);
+                
+                const grid = document.createElement('div');
+                grid.className = 'palette-grid';
+                
+                examData[section].forEach((q, index) => {
+                    const btn = document.createElement('div');
+                    btn.className = 'palette-question not-visited';
+                    btn.textContent = index + 1;
+                    btn.onclick = () => navigateToQuestion(section, index);
+                    btn.setAttribute('data-question-id', q.id);
+                    grid.appendChild(btn);
+                });
+                
+                sectionDiv.appendChild(grid);
+                container.appendChild(sectionDiv);
+            });
+        }
+
+        function loadQuestion() {
+            const questions = examData[currentSection];
+            const question = questions[currentQuestionIndex];
+            
+            if (questionStates[question.id].status === 'not-visited') {
+                questionStates[question.id].status = 'not-answered';
+            }
+            
+            document.getElementById('questionNumber').textContent = 
+                `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            document.getElementById('questionText').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'answer';
+                input.value = index;
+                input.id = `option${index}`;
+                
+                if (questionStates[question.id].answer !== null && 
+                    questionStates[question.id].answer === index) {
+                    input.checked = true;
+                    optionDiv.classList.add('selected');
+                }
+                
+                input.addEventListener('change', () => {
+                    document.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    if (input.checked) {
+                        optionDiv.classList.add('selected');
+                    }
+                });
+                
+                const label = document.createElement('label');
+                label.className = 'option-label';
+                label.htmlFor = `option${index}`;
+                label.textContent = option;
+                
+                optionDiv.appendChild(input);
+                optionDiv.appendChild(label);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            updatePalette();
+            updateStats();
+        }
+
+        function updatePalette() {
+            document.querySelectorAll('.palette-question').forEach(btn => {
+                const questionId = btn.getAttribute('data-question-id');
+                const state = questionStates[questionId];
+                
+                btn.className = 'palette-question ' + state.status;
+                
+                const questions = examData[currentSection];
+                if (state.section === currentSection && state.index === currentQuestionIndex) {
+                    btn.classList.add('current');
+                }
+            });
+        }
+
+        function updateStats() {
+            let answered = 0, notAnswered = 0, marked = 0, notVisited = 0;
+            
+            Object.values(questionStates).forEach(state => {
+                if (state.status === 'answered') answered++;
+                else if (state.status === 'not-answered') notAnswered++;
+                else if (state.status === 'marked') marked++;
+                else if (state.status === 'not-visited') notVisited++;
+            });
+            
+            document.getElementById('answeredCount').textContent = answered;
+            document.getElementById('notAnsweredCount').textContent = notAnswered;
+            document.getElementById('markedCount').textContent = marked;
+            document.getElementById('notVisitedCount').textContent = notVisited;
+        }
+
+        function saveAndNext() {
+            const questions = examData[currentSection];
+            const question = questions[currentQuestionIndex];
+            const selected = document.querySelector('input[name="answer"]:checked');
+            
+            if (selected) {
+                questionStates[question.id].answer = parseInt(selected.value);
+                questionStates[question.id].status = 'answered';
+            }
+            
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                const currentSectionIndex = selectedSubjects.indexOf(currentSection);
+                if (currentSectionIndex < selectedSubjects.length - 1) {
+                    changeSection(selectedSubjects[currentSectionIndex + 1]);
+                }
+            }
+        }
+
+        function markForReview() {
+            const questions = examData[currentSection];
+            const question = questions[currentQuestionIndex];
+            const selected = document.querySelector('input[name="answer"]:checked');
+            
+            if (selected) {
+                questionStates[question.id].answer = parseInt(selected.value);
+            }
+            questionStates[question.id].status = 'marked';
+            
+            saveAndNext();
+        }
+
+        function clearResponse() {
+            const questions = examData[currentSection];
+            const question = questions[currentQuestionIndex];
+            
+            questionStates[question.id].answer = null;
+            if (questionStates[question.id].status === 'answered') {
+                questionStates[question.id].status = 'not-answered';
+            }
+            
+            document.querySelectorAll('input[name="answer"]').forEach(input => {
+                input.checked = false;
+            });
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            updatePalette();
+            updateStats();
+        }
+
+        function navigateToQuestion(section, index) {
+            currentSection = section;
+            currentQuestionIndex = index;
+            
+            document.querySelectorAll('.section-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.section === section);
+            });
+            
+            loadQuestion();
+        }
+
+        function showSubmitModal() {
+            updateStats();
+            document.getElementById('modalAnswered').textContent = document.getElementById('answeredCount').textContent;
+            document.getElementById('modalNotAnswered').textContent = document.getElementById('notAnsweredCount').textContent;
+            document.getElementById('modalMarked').textContent = document.getElementById('markedCount').textContent;
+            document.getElementById('modalNotVisited').textContent = document.getElementById('notVisitedCount').textContent;
+            
+            document.getElementById('submitModal').classList.add('active');
+        }
+
+        function closeSubmitModal() {
+            document.getElementById('submitModal').classList.remove('active');
+        }
+
+        function submitExam() {
+            clearInterval(timerInterval);
+            
+            let correct = 0;
+            let incorrect = 0;
+            let unanswered = 0;
+
+            Object.keys(examData).forEach(section => {
+                examData[section].forEach(question => {
+                    const state = questionStates[question.id];
+                    if (state.answer !== null) {
+                        if (state.answer === question.correctAnswer) {
+                            correct++;
+                        } else {
+                            incorrect++;
+                        }
+                    } else {
+                        unanswered++;
+                    }
+                });
+            });
+
+            const totalScore = (correct * 4) - (incorrect * 1);
+            const totalPossible = (correct + incorrect + unanswered) * 4;
+            
+            alert(`Exam Submitted Successfully!\n\n✅ Correct: ${correct}\n❌ Incorrect: ${incorrect}\n⊘ Unanswered: ${unanswered}\n\n📊 Total Score: ${totalScore} / ${totalPossible}\n🎯 Percentage: ${((totalScore/totalPossible)*100).toFixed(1)}%`);
+            
+            window.location.reload();
+        }
+
+        function autoSubmitExam() {
+            alert('Time is up! Your exam has been automatically submitted.');
+            submitExam();
+        }
+    </script>
+</body>
+</html>
