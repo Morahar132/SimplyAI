@@ -204,8 +204,8 @@
         </div>
     </div>
 
-    <script src="question-bank.js"></script>
     <script>
+        const API_BASE_URL = 'http://localhost:3000';
         // Global variables
         let examData = {};
         let currentSection = null;
@@ -241,8 +241,8 @@
             });
         }
 
-        // Generate exam using sample questions
-        function generateExam() {
+        // Generate exam using API questions
+        async function generateExam() {
             if (selectedSubjects.length === 0) {
                 alert('Please select at least one subject!');
                 return;
@@ -256,15 +256,32 @@
             document.getElementById('generateBtn').disabled = true;
             document.getElementById('loadingOverlay').classList.add('active');
 
-            setTimeout(() => {
-                examData = {};
-                
-                selectedSubjects.forEach(subject => {
-                    examData[subject] = QUESTION_BANK[subject].slice(0, numQuestions);
+            try {
+                const query = new URLSearchParams({
+                    subjects: selectedSubjects.join(','),
+                    count: String(numQuestions),
+                    difficulty: selectedDifficulty
                 });
 
+                const response = await fetch(`${API_BASE_URL}/api/questions?${query.toString()}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch questions');
+                }
+
+                const data = await response.json();
+                examData = data.questions || {};
+
+                if (Object.keys(examData).length === 0) {
+                    throw new Error('No questions returned');
+                }
+
                 startExam();
-            }, 1500);
+            } catch (error) {
+                console.error(error);
+                alert('Unable to load questions. Please try again.');
+                document.getElementById('loadingOverlay').classList.remove('active');
+                document.getElementById('generateBtn').disabled = false;
+            }
         }
 
         function startExam() {
