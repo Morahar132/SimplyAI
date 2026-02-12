@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Performance Report: AI Highlight V3</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#1C8CD1",
+                        "background-light": "#F3F4F6",
+                        "background-dark": "#0A0A0A",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#18181b",
+                        "surface-variant-light": "#E5E7EB",
+                        "surface-variant-dark": "#27272a",
+                        "text-primary-light": "#111827",
+                        "text-primary-dark": "#F9FAFB",
+                        "text-secondary-light": "#6B7280",
+                        "text-secondary-dark": "#9CA3AF",
+                        "success": "#10B981",
+                        "error": "#EF4444",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #4B5563;
+            border-radius: 20px;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        /* AI Glow Effect Classes */
+        .ai-glow {
+            box-shadow: 0 0 20px rgba(28, 140, 209, 0.15), inset 0 0 0 1px rgba(28, 140, 209, 0.3);
+        }
+        .ai-sparkle-bg {
+             background: radial-gradient(circle at top right, rgba(28, 140, 209, 0.15), transparent 70%);
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark transition-colors duration-200">
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
